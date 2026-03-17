@@ -150,10 +150,6 @@ Times are for snarkjs (JavaScript) on a modern server. Lower powers complete in 
 | Disk     | 400 GB   | 500 GB SSD  |
 | CPU      | 8 cores  | 16 cores    |
 
-**Tip:** Linode High Memory instances offer the best price-to-RAM ratio for this workload (e.g., High Memory 300 GB at $1.44/hr). CPU core count matters less than RAM — snarkjs is single-threaded.
-
-CPU core count matters less than single-core clock speed — snarkjs runs the FFT in a single JavaScript thread. Pick the instance type with the fastest per-core performance.
-
 ## Security
 
 These files contain **no secrets**. The preparation step is a deterministic computation (inverse FFT) over the publicly available Hermez ceremony output. The trust assumption rests entirely on the original [Hermez ceremony](https://blog.hermez.io/hermez-cryptographic-setup/) — as long as at least one of its participants destroyed their toxic waste, the ptau is secure.
