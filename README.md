@@ -20,23 +20,23 @@ The snarkjs `powersoftau prepare phase2` step converts the raw ceremony output (
 ```bash
 chmod +x prepare_ptau.sh
 
-# Prepare a range of powers (covers most circuits)
+# Full range — every Hermez power from 8 to 26
+./prepare_ptau.sh 8-26
+
+# Just the common range (covers most circuits)
 ./prepare_ptau.sh 14-23
 
-# All powers up to 25
-./prepare_ptau.sh 14-25
-
 # Specific powers only
-./prepare_ptau.sh 14 16 21 23
+./prepare_ptau.sh 8 12 16 21 23
 
 # Custom output directory
-./prepare_ptau.sh -o /data/ptau 14-25
+./prepare_ptau.sh -o /data/ptau 8-25
 
 # Keep raw Hermez files (default: deleted after preparation)
-./prepare_ptau.sh -k 14-25
+./prepare_ptau.sh -k 8-26
 
 # Limit parallel downloads (default: 3, max: 4)
-./prepare_ptau.sh -j 2 14-25
+./prepare_ptau.sh -j 2 8-26
 ```
 
 ## Output Structure
@@ -76,25 +76,34 @@ To integrate with an existing project, either:
 
 | Power | Raw download | Prepared file | Node.js heap | Typical use case |
 |-------|-------------|---------------|-------------|-----------------|
-| 14    | ~16 MB      | ~32 MB        | 4 GB        | tiny circuits   |
-| 15    | ~32 MB      | ~64 MB        | 4 GB        |                 |
-| 16    | ~60 MB      | ~128 MB       | 4 GB        | small circuits  |
-| 17    | ~128 MB     | ~256 MB       | 4 GB        |                 |
-| 18    | ~250 MB     | ~512 MB       | 4 GB        |                 |
-| 19    | ~512 MB     | ~1 GB         | 8 GB        |                 |
-| 20    | ~1 GB       | ~2 GB         | 8 GB        |                 |
-| 21    | ~2 GB       | ~4 GB         | 16 GB       | Groth16 large   |
-| 22    | ~4 GB       | ~8 GB         | 16 GB       |                 |
-| 23    | ~8 GB       | ~16 GB        | 28 GB       | PLONK large     |
-| 24    | ~16 GB      | ~32 GB        | 56 GB       | fflonk          |
-| 25    | ~32 GB      | ~64 GB        | 112 GB      |                 |
+| 8     | ~1 KB       | ~2 KB         | 0.5 GB      | 128 constraints     |
+| 9     | ~2 KB       | ~4 KB         | 0.5 GB      | 256 constraints     |
+| 10    | ~4 KB       | ~8 KB         | 0.5 GB      | 512 constraints     |
+| 11    | ~8 KB       | ~16 KB        | 0.5 GB      | 1k constraints      |
+| 12    | ~64 KB      | ~128 KB       | 0.5 GB      | 2k constraints      |
+| 13    | ~256 KB     | ~512 KB       | 1 GB        | 4k constraints      |
+| 14    | ~16 MB      | ~32 MB        | 1 GB        | 8k constraints      |
+| 15    | ~32 MB      | ~64 MB        | 1 GB        | 16k constraints     |
+| 16    | ~60 MB      | ~128 MB       | 4 GB        | small circuits      |
+| 17    | ~128 MB     | ~256 MB       | 4 GB        |                     |
+| 18    | ~250 MB     | ~512 MB       | 4 GB        |                     |
+| 19    | ~512 MB     | ~1 GB         | 8 GB        |                     |
+| 20    | ~1 GB       | ~2 GB         | 8 GB        |                     |
+| 21    | ~2 GB       | ~4 GB         | 16 GB       | Groth16 large       |
+| 22    | ~4 GB       | ~8 GB         | 16 GB       |                     |
+| 23    | ~8 GB       | ~16 GB        | 28 GB       | PLONK large         |
+| 24    | ~16 GB      | ~32 GB        | 56 GB       | fflonk              |
+| 25    | ~32 GB      | ~64 GB        | 112 GB      |                     |
+| 26    | ~64 GB      | ~128 GB       | 224 GB      | very large circuits |
 
 ### Totals for common ranges
 
 | Range  | Total download | Total prepared (what you keep) | Peak disk during prep | Min system RAM |
 |--------|---------------|-------------------------------|----------------------|---------------|
-| 14-23  | ~16 GB        | ~31 GB                        | ~55 GB               | 32 GB         |
-| 14-25  | ~64 GB        | ~128 GB                       | ~200 GB              | 128 GB        |
+| 8-13   | < 1 MB        | < 1 MB                        | < 1 MB               | 1 GB          |
+| 8-23   | ~16 GB        | ~31 GB                        | ~55 GB               | 32 GB         |
+| 8-25   | ~64 GB        | ~128 GB                       | ~200 GB              | 128 GB        |
+| 8-26   | ~128 GB       | ~256 GB                       | ~400 GB              | 256 GB        |
 
 ## Estimated Timing
 
@@ -102,6 +111,7 @@ Times are for snarkjs (JavaScript) on a modern server. Lower powers complete in 
 
 | Power | Prepare time (approx) |
 |-------|----------------------|
+| 8-13  | instant              |
 | 14-18 | seconds each         |
 | 19-20 | 1-5 min each         |
 | 21    | ~15-30 min           |
@@ -109,12 +119,14 @@ Times are for snarkjs (JavaScript) on a modern server. Lower powers complete in 
 | 23    | ~1-3 hours           |
 | 24    | ~3-8 hours           |
 | 25    | ~8-20 hours          |
+| 26    | ~20-40 hours         |
 
-**Total for 14-25**: roughly 12-30 hours, dominated by powers 24 and 25.
+**Total for 8-25**: roughly 12-30 hours, dominated by powers 24 and 25.
+**Total for 8-26**: roughly 30-70 hours, dominated by power 26.
 
 ## Server Recommendations
 
-### For powers 14-23 (Groth16 + PLONK)
+### For powers 8-23 (Groth16 + PLONK)
 
 | Resource | Minimum  | Recommended |
 |----------|----------|-------------|
@@ -122,13 +134,23 @@ Times are for snarkjs (JavaScript) on a modern server. Lower powers complete in 
 | Disk     | 60 GB    | 80 GB       |
 | CPU      | 4 cores  | 8 cores     |
 
-### For powers 14-25 (including fflonk at large N)
+### For powers 8-25 (including fflonk at large N)
 
 | Resource | Minimum  | Recommended |
 |----------|----------|-------------|
-| RAM      | 128 GB   | 128 GB      |
+| RAM      | 128 GB   | 150 GB      |
 | Disk     | 200 GB   | 250 GB SSD  |
 | CPU      | 8 cores  | 16 cores    |
+
+### For powers 8-26 (near-maximum)
+
+| Resource | Minimum  | Recommended |
+|----------|----------|-------------|
+| RAM      | 256 GB   | 300 GB      |
+| Disk     | 400 GB   | 500 GB SSD  |
+| CPU      | 8 cores  | 16 cores    |
+
+**Tip:** Linode High Memory instances offer the best price-to-RAM ratio for this workload (e.g., High Memory 300 GB at $1.44/hr). CPU core count matters less than RAM — snarkjs is single-threaded.
 
 CPU core count matters less than single-core clock speed — snarkjs runs the FFT in a single JavaScript thread. Pick the instance type with the fastest per-core performance.
 

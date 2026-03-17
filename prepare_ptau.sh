@@ -15,10 +15,10 @@
 # Usage:
 #   ./prepare_ptau.sh [OPTIONS] <power|range> [<power|range> ...]
 #
-# Arguments:
-#   14          single power
-#   14-23       inclusive range
-#   14-20 23    mix of ranges and singles
+# Arguments (powers 8-28):
+#   12          single power
+#   8-26        inclusive range
+#   8-20 23 26  mix of ranges and singles
 #
 # Options:
 #   -o DIR      output directory (default: ./ptau)
@@ -27,9 +27,9 @@
 #   -h          show this help
 #
 # Examples:
-#   ./prepare_ptau.sh 14-23                       # range, output to ./ptau
-#   ./prepare_ptau.sh -o /data/ptau 14 16 21 23   # specific powers, custom dir
-#   ./prepare_ptau.sh -k -o /data/ptau 14-25       # keep raw files
+#   ./prepare_ptau.sh 8-26                        # full range, output to ./ptau
+#   ./prepare_ptau.sh -o /data/ptau 8 12 16 21 23 # specific powers, custom dir
+#   ./prepare_ptau.sh -k -o /data/ptau 8-25        # keep raw files
 # ============================================================================
 set -e
 
@@ -106,15 +106,17 @@ echo ""
 # points. Memory scales exponentially. These values give ~2x headroom.
 heap_size_for_power() {
   local P=$1
-  if   [ "$P" -le 18 ]; then echo 4096     #  4 GB — powers 8-18
-  elif [ "$P" -le 20 ]; then echo 8192     #  8 GB — powers 19-20
-  elif [ "$P" -le 22 ]; then echo 16384    # 16 GB — powers 21-22
-  elif [ "$P" -eq 23 ]; then echo 28672    # 28 GB — power 23
-  elif [ "$P" -eq 24 ]; then echo 57344    # 56 GB — power 24
-  elif [ "$P" -eq 25 ]; then echo 114688   #112 GB — power 25
-  elif [ "$P" -eq 26 ]; then echo 229376   #224 GB — power 26
-  elif [ "$P" -eq 27 ]; then echo 458752   #448 GB — power 27
-  elif [ "$P" -eq 28 ]; then echo 917504   #896 GB — power 28
+  if   [ "$P" -le 12 ]; then echo 512      # 0.5 GB — powers 8-12
+  elif [ "$P" -le 15 ]; then echo 1024     #   1 GB — powers 13-15
+  elif [ "$P" -le 18 ]; then echo 4096     #   4 GB — powers 16-18
+  elif [ "$P" -le 20 ]; then echo 8192     #   8 GB — powers 19-20
+  elif [ "$P" -le 22 ]; then echo 16384    #  16 GB — powers 21-22
+  elif [ "$P" -eq 23 ]; then echo 28672    #  28 GB — power 23
+  elif [ "$P" -eq 24 ]; then echo 57344    #  56 GB — power 24
+  elif [ "$P" -eq 25 ]; then echo 114688   # 112 GB — power 25
+  elif [ "$P" -eq 26 ]; then echo 229376   # 224 GB — power 26
+  elif [ "$P" -eq 27 ]; then echo 458752   # 448 GB — power 27
+  elif [ "$P" -eq 28 ]; then echo 917504   # 896 GB — power 28
   fi
 }
 
